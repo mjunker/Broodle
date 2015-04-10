@@ -6,8 +6,8 @@ module.exports.load = function (calendarConfig, dateFrom, dateTo, callback) {
         options: {
             url: 'https://www.googleapis.com/calendar/v3/calendars/'
             + encodeURIComponent(calendarConfig.id) + '/events?singleEvents=true'
-            + '&timeMax=' + encodeURIComponent(dateTo)
-            + '&timeMin=' + encodeURIComponent(dateFrom),
+            + '&timeMax=' + encodeURIComponent(dateTo.toISOString())
+            + '&timeMin=' + encodeURIComponent(dateFrom$.toISOString()),
             jwt: {
                 email: calendarConfig.email,
                 keyFile: calendarConfig.keyfile,
