@@ -9,7 +9,7 @@ module.exports.cancelCurrentWeekEvent = function () {
 
     var currentDate = _.now();
 
-    gcalLoader.load(config.deanwake.mainCalendarId, timeFrom, timeTo, function (err, res, body) {
+    gcalLoader.load(config.deanwake.mainCalendar, timeFrom, timeTo, function (err, res, body) {
         console.log(JSON.parse(body));
     });
 
