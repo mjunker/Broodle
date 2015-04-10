@@ -59,8 +59,4 @@ app.use(function (err, req, res, next) {
     });
 });
 
-
-var server = http.createServer(app);
-server.listen(3001);
-console.log('Express server started on port %s', server.address().port);
 module.exports = app;
