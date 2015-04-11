@@ -3,7 +3,7 @@ var _ = require('lodash');
 var moment = require('moment');
 var momentRange = require('moment-range');
 
-var mailUrlFormat = 'YYYY-MM-DD-HH-MM';
+var mailUrlFormat = 'YYYY-MM-DD';
 
 module.exports.findUserByUserName = function (group, username) {
     return _.find(config[group].members, function (member) {
@@ -20,5 +20,11 @@ module.exports.parseDateFromUrl = function (date) {
 }
 
 module.exports.formatAsDateString = function (date) {
-    return date.format('YYYY-MM-DD');
+    return date.format(mailUrlFormat);
+}
+
+module.exports.findNextUserWithoutVote = function (candidate, members) {
+    return _.find(members, function (member) {
+        return !_.has(candidate.votes, member.username);
+    });
 }

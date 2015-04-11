@@ -1,5 +1,5 @@
 var express = require('express');
-var voteAccepter = require('../application/actions/voteAccepter');
+var voteDayAccepter = require('../application/actions/voteDayAccepter');
 
 var router = express.Router();
 
@@ -8,7 +8,7 @@ router.get('/:group/:user/:date/:vote', function (req, res) {
     var username = req.param("user");
     var votedDate = req.param("date");
     var vote = req.param("vote");
-    voteAccepter.acceptVote(group, username, votedDate, vote);
+    voteDayAccepter.acceptVote(group, username, votedDate, vote);
     res.render('index', {title: 'Vote accepted!'});
 
 });

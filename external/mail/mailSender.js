@@ -14,7 +14,7 @@ module.exports.sendMail = function (receiver, subject, message) {
         from: "Broodle <" + mailConfig.user + ">",
         to: receiver,
         subject: subject,
-        text: message
+        html: message
     }, function (error, response) {
         if (error) {
             console.log(error);
