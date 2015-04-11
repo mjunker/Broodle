@@ -8,18 +8,28 @@ var emailUtil = require('./emailUtil');
 module.exports.initVote = function (group, username) {
     var candidates = stateProvider.getState(group).candidates;
     var receiverEmail = util.findUserByUserName(group, username).email;
-    var subject = username + ": Bandprobe abgesagt!!!! Neuer Tag suchen!!!";
+    var subject = username + ": Bandprobe abgesagt! Neuer Tag suchen!";
     var message = createMessage(group, username, candidates);
     mailSender.sendMail(receiverEmail, subject, message);
 }
 
+function createTimeFromRanges(ranges) {
+    var time = '';
+    var format = 'HH:MM';
+
+    _.forEach(ranges, function (range) {
+        time += range.start.format(format) + '-' + range.end.format(format) + ' '
+    });
+    return time;
+
+}
 function createMessageForDayCandidate(group, username, candidate) {
-    var message = candidate.day + ' (' + emailUtil.createVoteInfoString(candidate) + '): ';
+    var message = candidate.day + ': ' + createTimeFromRanges(candidate.ranges);
     _.forEach(['yes', 'no', 'maybe'], function (voteOption) {
         var voteUrl = emailUtil.createVoteUrl('day', group, username, candidate.day, voteOption);
         message += emailUtil.createLink(voteUrl, voteOption) + ' ';
     });
-    return message;
+    return message + ' (' + emailUtil.createVoteInfoString(candidate) + ');';
 }
 
 function createMessage(group, username, candidates) {

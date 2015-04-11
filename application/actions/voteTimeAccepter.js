@@ -17,7 +17,7 @@ module.exports.acceptVote = function (group, username, votedDate, vote) {
         candidateTimeSlot.votes[username] = vote;
         var candidate = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidateDay.timeSlots, group);
         if (_.isUndefined(candidate)) {
-            letNextUserVote(group, candidateTimeSlot);
+            letNextUserVote(group, candidateDay, candidateTimeSlot);
         } else {
             finishTimeSelection(group, candidate);
         }
@@ -35,10 +35,10 @@ function finishTimeSelection(group, candidate) {
 
 }
 
-function letNextUserVote(group, candidate) {
-    var nextUser = util.findNextUserWithoutVote(candidate, config[group].members);
+function letNextUserVote(group, candidateDay, timeSlot) {
+    var nextUser = util.findNextUserWithoutVote(timeSlot, config[group].members);
     if (!_.isUndefined(nextUser)) {
-        voteTimePublisher.publishPossibleTimeRanges(group, candidate);
+        voteTimePublisher.publishPossibleTimeRanges(group, candidateDay, timeSlot);
     }
 }
 

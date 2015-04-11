@@ -9,19 +9,23 @@ var momentRange = require('moment-range');
 var mailSender = require('./../../external/mail/mailSender');
 
 
-function publishPossibleTimeRanges(group, candidateDay) {
-    var candidates = candidateDay.timeSlots;
-    var username = util.findNextUserWithoutVote(candidateDay, config[group].members);
-    var receiverEmail = util.findUserByUserName(group, username).email;
+function findNextUser(candidateDay, group) {
 
-    var subject = username + ": Tag gefunden!!!! Zeit auswählen!!!";
-    var message = createMessageForTimeCandidates(group, username, candidates);
+    return util.findNextUserWithoutVote(candidateDay, config[group].members);
+}
+function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
+    var candidates = candidateDay.timeSlots;
+    var user = findNextUser(timeSlot, group);
+    var receiverEmail = user.email;
+
+    var subject = user.username + ": Tag gefunden!!!! Zeit auswählen!!!";
+    var message = createMessageForTimeCandidates(group, user.username, candidates);
     mailSender.sendMail(receiverEmail, subject, message);
 }
 
 function initAndPublishTimeCandidates(group, candidateDay) {
     candidateDay.timeSlots = createPossibleTimeSlots(group, candidateDay);
-    publishPossibleTimeRanges(group, candidateDay);
+    publishPossibleTimeRanges(group, candidateDay, candidateDay.timeSlots[0]);
 }
 
 
