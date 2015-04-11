@@ -4,7 +4,7 @@ var moment = require('moment');
 var momentRange = require('moment-range');
 
 var dateFormat = 'YYYY-MM-DD';
-var dateTimeFormat = 'YYYY-MM-DD-HH-MM';
+var dateTimeFormat = 'YYYY-MM-DD-HH-mm';
 
 module.exports.findUserByUserName = function (group, username) {
     return _.find(config[group].members, function (member) {

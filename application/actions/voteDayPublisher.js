@@ -15,7 +15,7 @@ module.exports.initVote = function (group, username) {
 
 function createTimeFromRanges(ranges) {
     var time = '';
-    var format = 'HH:MM';
+    var format = 'HH:mm';
 
     _.forEach(ranges, function (range) {
         time += range.start.format(format) + '-' + range.end.format(format) + ' '

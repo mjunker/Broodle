@@ -10,7 +10,6 @@ var mailSender = require('./../../external/mail/mailSender');
 
 
 function findNextUser(candidateDay, group) {
-
     return util.findNextUserWithoutVote(candidateDay, config[group].members);
 }
 function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
@@ -18,7 +17,7 @@ function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
     var user = findNextUser(timeSlot, group);
     var receiverEmail = user.email;
 
-    var subject = user.username + ": Tag gefunden!!!! Zeit auswählen!!!";
+    var subject = user.username + ": Tag gefunden! Zeit auswählen!";
     var message = createMessageForTimeCandidates(group, user.username, candidates);
     mailSender.sendMail(receiverEmail, subject, message);
 }
@@ -30,13 +29,13 @@ function initAndPublishTimeCandidates(group, candidateDay) {
 
 
 function createMessageForTimeCandidate(group, username, dateToVoteFor) {
-    var message = dateToVoteFor.timeSlot.start.format('DD.MM.YYYY HH:MM') + ': ';
+    var message = dateToVoteFor.timeSlot.start.format('DD.MM.YYYY HH:mm') + ': ';
     _.forEach(['yes', 'no'], function (voteOption) {
-        var dateAsString = dateToVoteFor.timeSlot.start.format('YYYY-MM-DD-HH-MM');
+        var dateAsString = dateToVoteFor.timeSlot.start.format('YYYY-MM-DD-HH-mm');
         var voteUrl = emailUtil.createVoteUrl('time', group, username, dateAsString, voteOption);
         message += emailUtil.createLink(voteUrl, voteOption) + ' ';
     });
-    return message + '<br>';
+    return message + ' (' + emailUtil.createVoteInfoString(candidate) + ')' + '<br>';
 }
 
 function createMessageForTimeCandidates(group, username, candidates) {

@@ -1,6 +1,7 @@
 var util = require('./util');
 var _ = require('lodash');
 
+// TODO state pattern: lookingForDay, lookingForTime, done
 
 var state = {};
 module.exports.state = state;
