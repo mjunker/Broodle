@@ -6,28 +6,30 @@ var emailUtil = require('./emailUtil');
 var stateProvider = require('./applicationState');
 var moment = require('moment');
 var momentRange = require('moment-range');
+var mailSender = require('./../../external/mail/mailSender');
 
-module.exports.initAndPublishTimeCandidates = function (group, candidateDay) {
-    candidateDay.timeSlots = createPossibleTimeSlots(group, candidateDay);
-    publishPossibleTimeRanges(group, candidateDay);
-}
 
 function publishPossibleTimeRanges(group, candidateDay) {
     var candidates = candidateDay.timeSlots;
-    // var username = util.findNextUserWithoutVote(candidateDay, config[group].members);
-    // var receiverEmail = util.findUserByUserName(group, username).email;
-    var username = 'matt';
-    var receiverEmail = 'junker.matt@gmail.com';
+    var username = util.findNextUserWithoutVote(candidateDay, config[group].members);
+    var receiverEmail = util.findUserByUserName(group, username).email;
+
     var subject = username + ": Tag gefunden!!!! Zeit auswählen!!!";
     var message = createMessageForTimeCandidates(group, username, candidates);
     mailSender.sendMail(receiverEmail, subject, message);
 }
-module.exports.publishPossibleTimeRanges = publishPossibleTimeRanges;
+
+function initAndPublishTimeCandidates(group, candidateDay) {
+    candidateDay.timeSlots = createPossibleTimeSlots(group, candidateDay);
+    publishPossibleTimeRanges(group, candidateDay);
+}
+
 
 function createMessageForTimeCandidate(group, username, dateToVoteFor) {
     var message = dateToVoteFor.timeSlot.start.format('DD.MM.YYYY HH:MM') + ': ';
     _.forEach(['yes', 'no'], function (voteOption) {
-        var voteUrl = emailUtil.createVoteUrl('time', group, username, dateToVoteFor.timeSlot.start.format('YYYY-MM-DD-HH-MM'), voteOption);
+        var dateAsString = dateToVoteFor.timeSlot.start.format('YYYY-MM-DD-HH-MM');
+        var voteUrl = emailUtil.createVoteUrl('time', group, username, dateAsString, voteOption);
         message += emailUtil.createLink(voteUrl, voteOption) + ' ';
     });
     return message + '<br>';
@@ -55,3 +57,6 @@ function createPossibleTimeSlots(group, candidateDay) {
     });
     return timeSlots;
 }
+
+module.exports.initAndPublishTimeCandidates = initAndPublishTimeCandidates;
+module.exports.publishPossibleTimeRanges = publishPossibleTimeRanges;
