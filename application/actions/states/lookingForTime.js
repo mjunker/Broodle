@@ -29,7 +29,7 @@ module.exports.onAcceptTimeVote = function (group, username, date, vote) {
             "vote": vote
         };
         voteTimeAccepter.acceptVote(voteRequest);
-        return 'Vote accepted!';
+        return 'Vote accepted.';
     }
     return 'Day has not yet been chosen. Cannot vote for time yet.';
 }

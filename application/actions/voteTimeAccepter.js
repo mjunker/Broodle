@@ -5,6 +5,8 @@ var voteTimePublisher = require('./voteTimePublisher');
 var candidateStateAnalyzer = require('./candidateStateAnalyzer');
 var mailSender = require('./../../external/mail/mailSender');
 var noVotePending = require('./states/noVotePending');
+var state = require('./applicationStateProvider');
+
 
 module.exports.acceptVote = function (voteRequest) {
     var timeSlot = voteRequest.candidateTimeSlot;

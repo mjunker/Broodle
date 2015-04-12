@@ -3,9 +3,8 @@ var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
 var emailUtil = require('./emailUtil');
-var stateProvider = require('./applicationStateProvider');
 var moment = require('moment');
-var momentRange = require('moment-range');
+require('moment-range');
 var mailSender = require('./../../external/mail/mailSender');
 
 

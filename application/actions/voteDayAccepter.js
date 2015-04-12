@@ -7,24 +7,26 @@ var voteTimePublisher = require('./voteTimePublisher');
 var candidateStateAnalyzer = require('./candidateStateAnalyzer');
 var lookingForTimeState = require('./states/lookingForTime');
 
-module.exports.acceptVote = function (group, username, date, vote) {
-    var candidateDay = state.getCandidateDay(group, date);
-    candidateDay.votes[username] = vote;
+module.exports.acceptVote = function (voteRequest) {
+    var vote = voteRequest.vote;
+    voteRequest.candidateDay.votes[voteRequest.username] = vote;
     if (_.isEqual(vote, 'no')) {
-        handleNo(group, candidateDay, username);
+        handleNo(voteRequest);
     } else {
-        handleYesOrMaybe(group, candidateDay);
+        handleYesOrMaybe(voteRequest);
     }
 }
 
-function handleNo(group, candidateDay, username) {
+function handleNo(voteRequest) {
     // TODO MJU delay mail sending
-    deleteCandidate(group, candidateDay);
-    letUserVoteForNextCandidate(group, username);
+    deleteCandidate(voteRequest);
+    letUserVoteForNextCandidate(voteRequest);
 }
 
 
-function handleYesOrMaybe(group, candidateDay) {
+function handleYesOrMaybe(voteRequest) {
+    var group = voteRequest.group;
+    var candidateDay = voteRequest.candidateDay;
     var candidates = state.getState(group).candidates;
     var candidateWithVoteCompletedSuccessfully = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidates, group);
     if (_.isUndefined(candidateWithVoteCompletedSuccessfully)) {
@@ -44,8 +46,8 @@ function tryToFinishDaySelection(group, candidateDay) {
 }
 
 
-function letUserVoteForNextCandidate(group, username) {
-    voteDayPublisher.initVote(group, username);
+function letUserVoteForNextCandidate(voteRequest) {
+    voteDayPublisher.initVote(voteRequest.group, voteRequest.username);
     // TODO no more choices available for user - check if other users have to voteDay
 }
 
@@ -56,9 +58,10 @@ function letNextUserVote(candidate, group) {
     }
 }
 
-function deleteCandidate(group, candidateDay) {
+function deleteCandidate(voteRequest) {
     // TODO don't delete - just deactivate
-    state.getState(group).candidates = _.without(state.getState(group).candidates, candidateDay);
+    state.getState(voteRequest.group).candidates =
+        _.without(state.getState(voteRequest.group).candidates, voteRequest.candidateDay);
 }
 
 
