@@ -1,25 +1,29 @@
 var nodemailer = require("nodemailer");
-var mailConfig = require('../../emailConfig.json');
+var config = require('config');
 
 var smtpTransport = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-        user: mailConfig.user,
-        pass: mailConfig.password
+        user: config.get('mailAccount.user'),
+        pass: config.get('mailAccount.password')
     }
 });
 
 module.exports.sendMail = function (receiver, subject, message) {
-    smtpTransport.sendMail({
-        from: "Broodle <" + mailConfig.user + ">",
-        to: receiver,
-        subject: subject,
-        html: message
-    }, function (error, response) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Message sent: " + response.message);
-        }
-    });
+
+    if (config.get('mailAccount.sendMailEnabled')) {
+        smtpTransport.sendMail({
+            from: "Broodle",
+            to: receiver,
+            subject: subject,
+            html: message
+        }, function (error, response) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Message sent: " + response.message);
+            }
+        });
+    }
+
 }

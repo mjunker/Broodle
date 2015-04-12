@@ -6,7 +6,7 @@ var router = express.Router();
 router.get('/:group/:user', function (req, res, next) {
     var group = req.param("group");
     var username = req.param("user");
-    var message = state.getState(group).voteState.onCancel(group, username);
+    var message = state.getState(group).voteState.onFindNewEvent(group, username);
     res.render('index', {title: message});
 });
 

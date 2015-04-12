@@ -1,4 +1,4 @@
-var config = require('../../config.json');
+var config = require('config');
 var _ = require('lodash');
 var util = require('./util');
 var voteTimePublisher = require('./voteTimePublisher');
@@ -24,12 +24,12 @@ module.exports.acceptVote = function (voteRequest) {
 
 function finishTimeSelection(group, candidate) {
     var recipients = '';
-    _.forEach(config[group].members, function (member) {
+    _.forEach(config.get(group).members, function (member) {
         recipients += member.email + ',';
     });
 
     var start = util.formatAsDateTimeString(candidate.timeSlot.start);
-    mailSender.sendMail(recipients, 'Neuer Probetermin: ' + start, '');
+    mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + util.formatAsDateTimeString(start), '');
     state.updateVoteState(group, noVotePending);
 
 
@@ -42,7 +42,7 @@ function handleNoMoreTimeSlotsAvailable() {
     // TODO go back to lookingForTime mode if there are still open days
 }
 function letNextUserVote(group, candidateDay, timeSlot) {
-    var nextUser = util.findNextUserWithoutVote(timeSlot, config[group].members);
+    var nextUser = util.findNextUserWithoutVote(timeSlot, config.get(group).members);
     if (_.isUndefined(nextUser)) {
         nextUser = findNextUserFromTimeSlotWithMostVotes(candidateDay);
     }

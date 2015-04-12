@@ -12,7 +12,7 @@ module.exports.onAcceptTimeVote = function (group, username, votedDate, vote) {
     return 'No Vote pending';
 }
 
-module.exports.onCancel = function (group, username) {
+module.exports.onFindNewEvent = function (group, username) {
     eventCandidateDetector.findNewEvent(group, function () {
         state.updateVoteState(group, lookingForDayState);
         voteDayPublisher.initVote(group, username);

@@ -1,4 +1,4 @@
-var config = require('../../config.json');
+var config = require('config');
 var _ = require('lodash');
 var util = require('./util');
 var state = require('./applicationStateProvider');
@@ -11,7 +11,7 @@ function hasOnlyPositiveVotes(candidate) {
 function haveAllMembersVoted(candidate, group) {
 
     var haveAllVoted = true;
-    _.forEach(config[group].members, function (member) {
+    _.forEach(config.get(group).members, function (member) {
         if (!_.has(candidate.votes, member.username)) {
             haveAllVoted = false;
         }

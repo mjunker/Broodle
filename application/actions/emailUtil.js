@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var config = require('../../config.json');
+var config = require('config');
 
 
 module.exports.createLink = function (voteUrl, voteOption) {
@@ -7,7 +7,7 @@ module.exports.createLink = function (voteUrl, voteOption) {
 }
 
 module.exports.createVoteUrl = function (voteMode, group, username, dateToVoteFor, vote) {
-    return config.baseUrl + 'vote/' + voteMode + '/' + group + "/" + username + "/" + dateToVoteFor + "/" + vote;
+    return config.get('baseUrl') + 'vote/' + voteMode + '/' + group + "/" + username + "/" + dateToVoteFor + "/" + vote;
 }
 
 module.exports.createVoteInfoString = function (candidate) {

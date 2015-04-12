@@ -24,6 +24,6 @@ module.exports.onAcceptTimeVote = function (group, username, votedDate, vote) {
 
 }
 
-module.exports.onCancel = function (group, username) {
+module.exports.onFindNewEvent = function (group, username) {
     return 'Cannot cancel event. Other vote is still pending.';
 }

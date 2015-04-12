@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var cancel = require('./routes/cancel');
+var newVoteInitiator = require('./routes/initNewVote');
 var voteDay = require('./routes/voteDay');
 var voteTime = require('./routes/voteTime');
 
@@ -22,8 +22,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-
-app.use('/cancel', cancel);
+app.use('/findNewDate', newVoteInitiator);
 app.use('/vote/day', voteDay);
 app.use('/vote/time', voteTime);
 

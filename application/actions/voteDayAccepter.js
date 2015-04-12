@@ -1,4 +1,4 @@
-var config = require('../../config.json');
+var config = require('config');
 var _ = require('lodash');
 var util = require('./util');
 var state = require('./applicationStateProvider');
@@ -52,7 +52,7 @@ function letUserVoteForNextCandidate(voteRequest) {
 }
 
 function letNextUserVote(candidate, group) {
-    var nextUser = util.findNextUserWithoutVote(candidate, config[group].members);
+    var nextUser = util.findNextUserWithoutVote(candidate, config.get(group).members);
     if (!_.isUndefined(nextUser)) {
         voteDayPublisher.initVote(group, nextUser.username);
     }

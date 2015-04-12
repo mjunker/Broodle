@@ -1,0 +1,64 @@
+{
+  "mailAccount": {
+    "user": "",
+    "password": "",
+    "sendMailEnabled": false
+  },
+  "baseUrl": "",
+  "testGroup": {
+    "eventName": "Test Meeting",
+    "minDurationInHours": "3",
+    "dayRules": [
+      {
+        "on": "Monday",
+        "from": "18",
+        "until": "22"
+      },
+      {
+        "on": "Tuesday",
+        "from": "18",
+        "until": "22"
+      },
+      {
+        "on": "Wednesday",
+        "from": "18",
+        "until": "22"
+      },
+      {
+        "on": "Thursday",
+        "from": "18",
+        "until": "22"
+      },
+      {
+        "on": "Friday",
+        "from": "18",
+        "until": "22"
+      },
+      {
+        "on": "Saturday",
+        "from": "12",
+        "until": "23"
+      },
+      {
+        "on": "Sunday",
+        "from": "12",
+        "until": "23"
+      }
+    ],
+    "members": [
+      {
+        "username": "member1",
+        "email": "member1@gmail.com"
+      },
+      {
+        "username": "member2",
+        "email": "member2@gmail.com"
+      }
+    ],
+    "mainCalendar": {
+      "id": "",
+      "email": "",
+      "keyfile": ""
+    }
+  }
+}

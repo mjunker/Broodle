@@ -34,7 +34,7 @@ module.exports.onAcceptTimeVote = function (group, username, date, vote) {
     return 'Day has not yet been chosen. Cannot vote for time yet.';
 }
 
-module.exports.onCancel = function (group, username) {
+module.exports.onFindNewEvent = function (group, username) {
     return 'Cannot cancel event. Different vote is still pending.';
 }
 

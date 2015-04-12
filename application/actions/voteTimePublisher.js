@@ -1,5 +1,5 @@
 var mailSender = require('./../../external/mail/mailSender');
-var config = require('../../config.json');
+var config = require('config');
 var _ = require('lodash');
 var util = require('./util');
 var emailUtil = require('./emailUtil');
@@ -9,7 +9,7 @@ var mailSender = require('./../../external/mail/mailSender');
 
 
 function findNextUser(candidateDay, group) {
-    return util.findNextUserWithoutVote(candidateDay, config[group].members);
+    return util.findNextUserWithoutVote(candidateDay, config.get(group).members);
 }
 function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
     var candidates = candidateDay.timeSlots;
@@ -50,7 +50,7 @@ function createPossibleTimeSlots(group, candidateDay) {
     _.forEach(candidateDay.ranges, function (initialRange) {
         for (var currentTime = initialRange.start; currentTime.isBefore(initialRange.end); currentTime.add(1, 'hour')) {
             var timeSlotFrom = currentTime.clone();
-            var timeSlotTo = currentTime.clone().add(config[group].minDurationInHours, 'hour');
+            var timeSlotTo = currentTime.clone().add(config.get(group).minDurationInHours, 'hour');
             var timeSlotRange = moment().range(timeSlotFrom, timeSlotTo);
             if (initialRange.contains(timeSlotRange)) {
                 timeSlots.push({"timeSlot": timeSlotRange, "votes": {}});

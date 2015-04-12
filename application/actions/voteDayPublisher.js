@@ -1,5 +1,4 @@
 var mailSender = require('./../../external/mail/mailSender');
-var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
 var stateProvider = require('./applicationStateProvider');

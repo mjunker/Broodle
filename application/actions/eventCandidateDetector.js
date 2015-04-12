@@ -1,8 +1,8 @@
 var gcalLoader = require('./../../external/google_calendar/googleCalendarAccess');
-var config = require('../../config.json');
+var config = require('config');
 var _ = require('lodash');
 var moment = require('moment');
-var momentRange = require('moment-range');
+require('moment-range');
 var stateProvider = require('./applicationStateProvider');
 var util = require('./util');
 
@@ -16,12 +16,13 @@ function findNewEvent(group, callback) {
     var timeFrom = moment();
     var timeTo = moment().add(7, "days");
 
-    var candidates = initCandidates(config[group].dayRules, timeFrom.clone(), timeTo.clone());
+    var groupConfig = config.get(group);
+    var candidates = initCandidates(groupConfig.dayRules, timeFrom.clone(), timeTo.clone());
 
-    gcalLoader.load(config[group].mainCalendar, timeFrom, timeTo, function (err, res, body) {
+    gcalLoader.load(groupConfig.mainCalendar, timeFrom, timeTo, function (err, res, body) {
         var data = JSON.parse(body);
         subtractAllOccupiedDatesFromCandidates(candidates, data);
-        removeAllTooShortRanges(candidates, config[group].minDurationInHours);
+        removeAllTooShortRanges(candidates, groupConfig.minDurationInHours);
         candidates = removeDaysWithoutCandidates(candidates);
         stateProvider.getState(group).candidates = candidates;
         callback();
