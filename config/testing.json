@@ -5,6 +5,7 @@
     "sendMailEnabled": false
   },
   "baseUrl": "",
+  "delayTimeForEmails": 0,
   "testGroup": {
     "eventName": "Test Meeting",
     "minDurationInHours": "3",

@@ -1,12 +1,12 @@
 var util = require('./util');
 var _ = require('lodash');
 var noVotePendingState = require('./states/noVotePending');
+var schedule = require('node-schedule');
 
 var state = {};
-module.exports.state = state;
 
 function createInitialState() {
-    return {"voteState": noVotePendingState};
+    return {"voteState": noVotePendingState, "mailQueue": {}};
 }
 function getState(group) {
     if (!state.hasOwnProperty(group)) {
@@ -28,4 +28,22 @@ module.exports.getCandidateDay = function (group, date) {
     })
 }
 
+function cancelExistingJob(group, username) {
+    if (_.has(getState(group).mailQueue, username)
+        && !_.isUndefined(getState(group).mailQueue[username])) {
+        getState(group).mailQueue[username].cancel();
+    }
+}
+function setCurrentEmailJobForUser(group, username, date, sendFunction) {
+    var job = schedule.scheduleJob(date, function () {
+        sendFunction();
+    });
+    cancelExistingJob(group, username);
+    getState(group).mailQueue[username] = job;
+
+}
+
+module.exports.setCurrentEmailJobForUser = setCurrentEmailJobForUser;
+module.exports.cancelExistingJob = cancelExistingJob;
+module.exports.state = state;
 module.exports.getState = getState;

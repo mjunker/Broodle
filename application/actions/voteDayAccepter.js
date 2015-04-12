@@ -6,6 +6,9 @@ var voteDayPublisher = require('./voteDayPublisher');
 var voteTimePublisher = require('./voteTimePublisher');
 var candidateStateAnalyzer = require('./candidateStateAnalyzer');
 var lookingForTimeState = require('./states/lookingForTime');
+var moment = require('moment');
+
+var delayInSeconds = config.get('delayTimeForEmails');
 
 module.exports.acceptVote = function (voteRequest) {
     var vote = voteRequest.vote;
@@ -17,20 +20,29 @@ module.exports.acceptVote = function (voteRequest) {
     }
 }
 
-function handleNo(voteRequest) {
-    // TODO MJU delay mail sending
-    deleteCandidate(voteRequest);
-    letUserVoteForNextCandidate(voteRequest);
+function scheduleReminderEmail(voteRequest) {
+    var scheduledTime = moment().add(delayInSeconds, 'second').toDate();
+    state.setCurrentEmailJobForUser(voteRequest.group, voteRequest.username, scheduledTime, function () {
+        letUserVoteForNextCandidate(voteRequest);
+    });
 }
 
+function handleNo(voteRequest) {
+    deleteCandidate(voteRequest);
+    var candidates = state.getState(voteRequest.group).candidates;
+    if (!candidateStateAnalyzer.hasUserVotedYesAtLeastOnce(candidates, voteRequest.user)) {
+        scheduleReminderEmail(voteRequest);
+    }
+}
 
 function handleYesOrMaybe(voteRequest) {
+    state.cancelExistingJob(voteRequest.group, voteRequest.username);
     var group = voteRequest.group;
     var candidateDay = voteRequest.candidateDay;
     var candidates = state.getState(group).candidates;
     var candidateWithVoteCompletedSuccessfully = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidates, group);
     if (_.isUndefined(candidateWithVoteCompletedSuccessfully)) {
-        letNextUserVote(candidateDay, group);
+        scheduleMailForNextUser(voteRequest);
     } else {
         tryToFinishDaySelection(group, candidateDay);
     }
@@ -51,12 +63,25 @@ function letUserVoteForNextCandidate(voteRequest) {
     // TODO no more choices available for user - check if other users have to voteDay
 }
 
-function letNextUserVote(candidate, group) {
-    var nextUser = util.findNextUserWithoutVote(candidate, config.get(group).members);
+
+function scheduleMailForNextUser(voteRequest) {
+    var group = voteRequest.group;
+
+    var nextUser = candidateStateAnalyzer.findNextUserFromTimeSlotWithMostVotes(state.getState(group).candidates, group);
+
     if (!_.isUndefined(nextUser)) {
-        voteDayPublisher.initVote(group, nextUser.username);
+        var usernameNextUser = nextUser.username;
+
+        // wait some time because the previous user could still be voting
+        var scheduledTime = moment().add(delayInSeconds, 'second');
+        state.setCurrentEmailJobForUser(group, usernameNextUser, scheduledTime.toDate(), function () {
+            voteDayPublisher.initVote(group, usernameNextUser);
+        });
+    } else {
+        // TODO
     }
 }
+
 
 function deleteCandidate(voteRequest) {
     // TODO don't delete - just deactivate

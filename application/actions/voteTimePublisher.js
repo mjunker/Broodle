@@ -11,9 +11,8 @@ var mailSender = require('./../../external/mail/mailSender');
 function findNextUser(candidateDay, group) {
     return util.findNextUserWithoutVote(candidateDay, config.get(group).members);
 }
-function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
+function publishPossibleTimeRanges(group, candidateDay, user) {
     var candidates = candidateDay.timeSlots;
-    var user = findNextUser(timeSlot, group);
     var receiverEmail = user.email;
 
     var subject = user.username + ": Tag gefunden! Zeit auswählen!";
@@ -23,7 +22,8 @@ function publishPossibleTimeRanges(group, candidateDay, timeSlot) {
 
 function initAndPublishTimeCandidates(group, candidateDay) {
     candidateDay.timeSlots = createPossibleTimeSlots(group, candidateDay);
-    publishPossibleTimeRanges(group, candidateDay, candidateDay.timeSlots[0]);
+    var user = findNextUser(candidateDay.timeSlots[0], group);
+    publishPossibleTimeRanges(group, candidateDay, user);
 }
 
 

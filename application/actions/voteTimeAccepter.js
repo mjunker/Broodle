@@ -6,8 +6,35 @@ var candidateStateAnalyzer = require('./candidateStateAnalyzer');
 var mailSender = require('./../../external/mail/mailSender');
 var noVotePending = require('./states/noVotePending');
 var state = require('./applicationStateProvider');
+var moment = require('moment');
+
+var delayInSeconds = config.get('delayTimeForEmails');
 
 
+function detectNextUser(timeSlot, group, candidateDay) {
+    var nextUser = util.findNextUserWithoutVote(timeSlot, config.get(group).members);
+
+    if (_.isUndefined(nextUser)) {
+        nextUser = candidateDay.findNextUserFromTimeSlotWithMostVotes(candidateDay.timeSlots, group);
+    }
+    return nextUser;
+}
+function scheduleEmailForNextUser(voteRequest) {
+    var group = voteRequest.group;
+    var timeSlot = voteRequest.candidateTimeSlot;
+    var candidateDay = voteRequest.candidateDay;
+    var nextUser = detectNextUser(timeSlot, group, candidateDay);
+    if (_.isUndefined(nextUser)) {
+        handleNoMoreTimeSlotsAvailable();
+    } else {
+        var scheduledTime = moment().add(delayInSeconds, 'second').toDate();
+        state.setCurrentEmailJobForUser(voteRequest.group, nextUser.username, scheduledTime, function () {
+            voteTimePublisher.publishPossibleTimeRanges(voteRequest.group,
+                voteRequest.candidateDay, nextUser);
+        });
+    }
+
+}
 module.exports.acceptVote = function (voteRequest) {
     var timeSlot = voteRequest.candidateTimeSlot;
     timeSlot.votes[voteRequest.username] = voteRequest.vote;
@@ -16,7 +43,7 @@ module.exports.acceptVote = function (voteRequest) {
 
     var successfulCandidate = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidateDay.timeSlots, group);
     if (_.isUndefined(successfulCandidate)) {
-        letNextUserVote(group, candidateDay, timeSlot);
+        scheduleEmailForNextUser(voteRequest);
     } else {
         finishTimeSelection(group, successfulCandidate);
     }
@@ -29,28 +56,13 @@ function finishTimeSelection(group, candidate) {
     });
 
     var start = util.formatAsDateTimeString(candidate.timeSlot.start);
-    mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + util.formatAsDateTimeString(start), '');
+    mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + start, '');
     state.updateVoteState(group, noVotePending);
-
-
 }
 
-function findNextUserFromTimeSlotWithMostVotes(candidateDay) {
-    // TODO implement
-}
+
 function handleNoMoreTimeSlotsAvailable() {
     // TODO go back to lookingForTime mode if there are still open days
-}
-function letNextUserVote(group, candidateDay, timeSlot) {
-    var nextUser = util.findNextUserWithoutVote(timeSlot, config.get(group).members);
-    if (_.isUndefined(nextUser)) {
-        nextUser = findNextUserFromTimeSlotWithMostVotes(candidateDay);
-    }
-    if (_.isUndefined(nextUser)) {
-        handleNoMoreTimeSlotsAvailable();
-    } else {
-        voteTimePublisher.publishPossibleTimeRanges(group, candidateDay, timeSlot);
-    }
 }
 
 

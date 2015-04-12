@@ -6,9 +6,6 @@ require('moment-range');
 var stateProvider = require('./applicationStateProvider');
 var util = require('./util');
 
-
-
-
 function findNewEvent(group, callback) {
     stateProvider.resetState(group);
 
@@ -19,8 +16,7 @@ function findNewEvent(group, callback) {
     var groupConfig = config.get(group);
     var candidates = initCandidates(groupConfig.dayRules, timeFrom.clone(), timeTo.clone());
 
-    gcalLoader.load(groupConfig.mainCalendar, timeFrom, timeTo, function (err, res, body) {
-        var data = JSON.parse(body);
+    gcalLoader.load(groupConfig.mainCalendar, timeFrom, timeTo, function (err, res, data) {
         subtractAllOccupiedDatesFromCandidates(candidates, data);
         removeAllTooShortRanges(candidates, groupConfig.minDurationInHours);
         candidates = removeDaysWithoutCandidates(candidates);

@@ -14,5 +14,7 @@ module.exports.load = function (calendarConfig, dateFrom, dateTo, callback) {
                 scopes: ['https://www.googleapis.com/auth/calendar']
             }
         }
-    }, callback);
+    }, function (err, res, data) {
+        callback(err, res, JSON.parse(data));
+    });
 }
