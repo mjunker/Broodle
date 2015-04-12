@@ -1,26 +1,22 @@
 var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
-var state = require('./applicationState');
 var voteTimePublisher = require('./voteTimePublisher');
 var candidateStateAnalyzer = require('./candidateStateAnalyzer');
 var mailSender = require('./../../external/mail/mailSender');
+var noVotePending = require('./states/noVotePending');
 
+module.exports.acceptVote = function (voteRequest) {
+    var timeSlot = voteRequest.candidateTimeSlot;
+    timeSlot.votes[voteRequest.username] = voteRequest.vote;
+    var group = voteRequest.group;
+    var candidateDay = voteRequest.candidateDay;
 
-module.exports.acceptVote = function (group, username, votedDate, vote) {
-    var date = util.parseDateTimeFromUrl(votedDate);
-    var candidateDay = _.find(state.getState(group).candidates, function (candidate) {
-        return _.isEqual(util.formatAsDateString(date), candidate.day);
-    });
-    var candidateTimeSlot = findCandidateDay(candidateDay, date);
-    if (!_.isUndefined(candidateTimeSlot)) {
-        candidateTimeSlot.votes[username] = vote;
-        var candidate = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidateDay.timeSlots, group);
-        if (_.isUndefined(candidate)) {
-            letNextUserVote(group, candidateDay, candidateTimeSlot);
-        } else {
-            finishTimeSelection(group, candidate);
-        }
+    var successfulCandidate = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidateDay.timeSlots, group);
+    if (_.isUndefined(successfulCandidate)) {
+        letNextUserVote(group, candidateDay, timeSlot);
+    } else {
+        finishTimeSelection(group, successfulCandidate);
     }
 }
 
@@ -32,30 +28,27 @@ function finishTimeSelection(group, candidate) {
 
     var start = util.formatAsDateTimeString(candidate.timeSlot.start);
     mailSender.sendMail(recipients, 'Neuer Probetermin: ' + start, '');
+    state.updateVoteState(group, noVotePending);
+
 
 }
 
+function findNextUserFromTimeSlotWithMostVotes(candidateDay) {
+    // TODO implement
+}
+function handleNoMoreTimeSlotsAvailable() {
+    // TODO go back to lookingForTime mode if there are still open days
+}
 function letNextUserVote(group, candidateDay, timeSlot) {
     var nextUser = util.findNextUserWithoutVote(timeSlot, config[group].members);
-    if (!_.isUndefined(nextUser)) {
+    if (_.isUndefined(nextUser)) {
+        nextUser = findNextUserFromTimeSlotWithMostVotes(candidateDay);
+    }
+    if (_.isUndefined(nextUser)) {
+        handleNoMoreTimeSlotsAvailable();
+    } else {
         voteTimePublisher.publishPossibleTimeRanges(group, candidateDay, timeSlot);
     }
 }
 
-function findCandidateDay(candidateDay, date) {
-    if (!_.isUndefined(candidateDay)) {
-        var candidate = findCandidateTimeSlot(candidateDay, date);
-        if (!_.isUndefined(candidate)) {
-            return candidate;
-        }
-    }
-    return null;
-}
 
-function findCandidateTimeSlot(candidateDay, date) {
-    var candidate = _.find(candidateDay.timeSlots, function (candidate) {
-        return _.isEqual(candidate.timeSlot.start.hour(), date.hour())
-            && _.isEqual(candidate.timeSlot.start.minute(), date.minute());
-    });
-    return candidate;
-}

@@ -1,22 +1,25 @@
 var util = require('./util');
 var _ = require('lodash');
-
-// TODO state pattern: lookingForDay, lookingForTime, done
+var noVotePendingState = require('./states/noVotePending');
 
 var state = {};
 module.exports.state = state;
 
+function createInitialState() {
+    return {"voteState": noVotePendingState};
+}
 function getState(group) {
     if (!state.hasOwnProperty(group)) {
-        state[group] = {};
+        state[group] = createInitialState();
     }
     return state[group];
 };
-
-module.exports.getState = getState;
+module.exports.updateVoteState = function (group, newVoteState) {
+    state[group].voteState = newVoteState;
+};
 
 module.exports.resetState = function (group) {
-    state[group] = {};
+    state[group] = createInitialState();
 };
 
 module.exports.getCandidateDay = function (group, date) {
@@ -24,3 +27,5 @@ module.exports.getCandidateDay = function (group, date) {
         return _.isEqual(candidateDay.day, util.formatAsDateString(date));
     })
 }
+
+module.exports.getState = getState;

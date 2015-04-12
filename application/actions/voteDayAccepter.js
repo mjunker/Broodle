@@ -1,13 +1,13 @@
 var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
-var state = require('./applicationState');
+var state = require('./applicationStateProvider');
 var voteDayPublisher = require('./voteDayPublisher');
 var voteTimePublisher = require('./voteTimePublisher');
 var candidateStateAnalyzer = require('./candidateStateAnalyzer');
+var lookingForTimeState = require('./states/lookingForTime');
 
-module.exports.acceptVote = function (group, username, votedDate, vote) {
-    var date = util.parseDateFromUrl(votedDate);
+module.exports.acceptVote = function (group, username, date, vote) {
     var candidateDay = state.getCandidateDay(group, date);
     candidateDay.votes[username] = vote;
     if (_.isEqual(vote, 'no')) {
@@ -17,18 +17,13 @@ module.exports.acceptVote = function (group, username, votedDate, vote) {
     }
 }
 
-function deleteCandidate(group, candidateDay) {
-    // TODO don't delete - just deactivate
-    state.getState(group).candidates = _.without(state.getState(group).candidates, candidateDay);
+function handleNo(group, candidateDay, username) {
+    // TODO MJU delay mail sending
+    deleteCandidate(group, candidateDay);
+    letUserVoteForNextCandidate(group, username);
 }
 
-function tryToFinishDaySelection(group, candidateDay) {
-    if (candidateStateAnalyzer.allVotesAre(candidateDay, ['yes'])) {
-        voteTimePublisher.initAndPublishTimeCandidates(group, candidateDay);
-    } else {
-        // TODO
-    }
-}
+
 function handleYesOrMaybe(group, candidateDay) {
     var candidates = state.getState(group).candidates;
     var candidateWithVoteCompletedSuccessfully = candidateStateAnalyzer.findCandidateWithAllPositiveVotes(candidates, group);
@@ -38,11 +33,16 @@ function handleYesOrMaybe(group, candidateDay) {
         tryToFinishDaySelection(group, candidateDay);
     }
 }
-function handleNo(group, candidateDay, username) {
-    // TODO MJU delay mail sending
-    deleteCandidate(group, candidateDay);
-    letUserVoteForNextCandidate(group, username);
+
+function tryToFinishDaySelection(group, candidateDay) {
+    if (candidateStateAnalyzer.allVotesAre(candidateDay, ['yes'])) {
+        state.updateVoteState(group, lookingForTimeState);
+        voteTimePublisher.initAndPublishTimeCandidates(group, candidateDay);
+    } else {
+        // TODO ask for confirmation on maybe date
+    }
 }
+
 
 function letUserVoteForNextCandidate(group, username) {
     voteDayPublisher.initVote(group, username);
@@ -55,4 +55,11 @@ function letNextUserVote(candidate, group) {
         voteDayPublisher.initVote(group, nextUser.username);
     }
 }
+
+function deleteCandidate(group, candidateDay) {
+    // TODO don't delete - just deactivate
+    state.getState(group).candidates = _.without(state.getState(group).candidates, candidateDay);
+}
+
+
 

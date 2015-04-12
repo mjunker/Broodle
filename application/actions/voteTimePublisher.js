@@ -3,7 +3,7 @@ var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
 var emailUtil = require('./emailUtil');
-var stateProvider = require('./applicationState');
+var stateProvider = require('./applicationStateProvider');
 var moment = require('moment');
 var momentRange = require('moment-range');
 var mailSender = require('./../../external/mail/mailSender');
@@ -28,10 +28,10 @@ function initAndPublishTimeCandidates(group, candidateDay) {
 }
 
 
-function createMessageForTimeCandidate(group, username, dateToVoteFor) {
-    var message = dateToVoteFor.timeSlot.start.format('DD.MM.YYYY HH:mm') + ': ';
+function createMessageForTimeCandidate(group, username, candidate) {
+    var message = candidate.timeSlot.start.format('DD.MM.YYYY HH:mm') + ': ';
     _.forEach(['yes', 'no'], function (voteOption) {
-        var dateAsString = dateToVoteFor.timeSlot.start.format('YYYY-MM-DD-HH-mm');
+        var dateAsString = candidate.timeSlot.start.format('YYYY-MM-DD-HH-mm');
         var voteUrl = emailUtil.createVoteUrl('time', group, username, dateAsString, voteOption);
         message += emailUtil.createLink(voteUrl, voteOption) + ' ';
     });

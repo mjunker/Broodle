@@ -2,7 +2,7 @@ var mailSender = require('./../../external/mail/mailSender');
 var config = require('../../config.json');
 var _ = require('lodash');
 var util = require('./util');
-var stateProvider = require('./applicationState');
+var stateProvider = require('./applicationStateProvider');
 var emailUtil = require('./emailUtil');
 
 module.exports.initVote = function (group, username) {

@@ -1,5 +1,6 @@
 var express = require('express');
-var voteTimeAccepter = require('../application/actions/voteTimeAccepter');
+var state = require('./../application/actions/applicationStateProvider');
+var util = require('./../application/actions/util');
 
 var router = express.Router();
 
@@ -8,9 +9,10 @@ router.get('/:group/:user/:date/:vote', function (req, res) {
     var username = req.param("user");
     var votedDate = req.param("date");
     var vote = req.param("vote");
-    voteTimeAccepter.acceptVote(group, username, votedDate, vote);
-    res.render('index', {title: 'Vote accepted!'});
+    var date = util.parseDateTimeFromUrl(votedDate);
 
+    var message = state.getState(group).voteState.onAcceptTimeVote(group, username, date, vote);
+    res.render('index', {title: message});
 });
 
 

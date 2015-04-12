@@ -3,7 +3,7 @@ var config = require('../../config.json');
 var _ = require('lodash');
 var moment = require('moment');
 var momentRange = require('moment-range');
-var stateProvider = require('./applicationState');
+var stateProvider = require('./applicationStateProvider');
 var util = require('./util');
 
 
