@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var newVoteInitiator = require('./routes/initNewVote');
 var voteDay = require('./routes/voteDay');
 var voteTime = require('./routes/voteTime');
+var resetRoute = require('./routes/reset');
+var createGoogleCalEntry = require('./routes/createGoogleCalEntry');
 
 
 var app = express();
@@ -25,6 +27,7 @@ app.use(cookieParser());
 app.use('/findNewDate', newVoteInitiator);
 app.use('/vote/day', voteDay);
 app.use('/vote/time', voteTime);
+app.use('/reset', resetRoute);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

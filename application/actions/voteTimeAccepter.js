@@ -7,6 +7,8 @@ var mailSender = require('./../../external/mail/mailSender');
 var noVotePending = require('./states/noVotePending');
 var state = require('./applicationStateProvider');
 var moment = require('moment');
+var googleCalAccess = require('./../../external/google_calendar/googleCalendarAccess');
+
 
 var delayInSeconds = config.get('delayTimeForEmails');
 
@@ -51,11 +53,15 @@ module.exports.acceptVote = function (voteRequest) {
 
 function finishTimeSelection(group, candidate) {
     var recipients = '';
-    _.forEach(config.get(group).members, function (member) {
+    var groupConfig = config.get(group);
+    var members = groupConfig.members;
+    _.forEach(members, function (member) {
         recipients += member.email + ',';
     });
 
     mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + candidate.timeSlot.start.format('DD.MM.YYYY HH:MM'), '');
+    googleCalAccess.addEvent(members, groupConfig.mainCalendar,candidate.timeSlot.start, candidate.timeSlot.end, function() {
+    })
     state.updateVoteState(group, noVotePending);
 }
 

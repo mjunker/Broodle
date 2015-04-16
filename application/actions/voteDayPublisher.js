@@ -26,7 +26,8 @@ function createMessageForDayCandidate(group, username, candidate) {
     var dayString = candidate.ranges[0].start.format('dddd, D.M');
     var message = '';
     message += dayString + ': ' + createTimeFromRanges(candidate.ranges);
-    _.forEach(['yes', 'no', 'maybe'], function (voteOption) {
+    // TODO maybe
+    _.forEach(['yes', 'no'], function (voteOption) {
         var voteUrl = emailUtil.createVoteUrl('day', group, username, candidate.day, voteOption);
         message += emailUtil.createLink(voteUrl, voteOption) + ' ';
     });
