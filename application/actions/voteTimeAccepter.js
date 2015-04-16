@@ -55,8 +55,7 @@ function finishTimeSelection(group, candidate) {
         recipients += member.email + ',';
     });
 
-    var start = util.formatAsDateTimeString(candidate.timeSlot.start);
-    mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + start, '');
+    mailSender.sendMail(recipients, 'Bestätigung: Bandprobe am ' + candidate.timeSlot.start.format('DD.MM.YYYY HH:MM'), '');
     state.updateVoteState(group, noVotePending);
 }
 
