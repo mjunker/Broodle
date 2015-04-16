@@ -14,8 +14,8 @@ module.exports.createVoteInfoString = function (candidate) {
     var result = '';
     for (var username in candidate.votes) {
         if (_.has(candidate.votes, username)) {
-            result += username + ": " + candidate.votes[username];
+            result += username + ": " + candidate.votes[username] + ', ';
         }
     }
-    return result;
+    return result.substring(0, result.length - 2);
 }

@@ -6,7 +6,7 @@ var _ = require('lodash');
 
 
 module.exports.onAcceptDayVote = function (group, username, votedDate, vote) {
-    lookingForDayState.onAcceptDayVote(group, username, votedDate, vote);
+    return 'Day was already chosen. Vote for time is in progress.';
 }
 
 module.exports.onAcceptTimeVote = function (group, username, date, vote) {

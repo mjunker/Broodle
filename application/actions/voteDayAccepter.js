@@ -23,16 +23,17 @@ module.exports.acceptVote = function (voteRequest) {
 function scheduleReminderEmail(voteRequest) {
     var scheduledTime = moment().add(delayInSeconds, 'second').toDate();
     state.setCurrentEmailJobForUser(voteRequest.group, voteRequest.username, scheduledTime, function () {
-        letUserVoteForNextCandidate(voteRequest);
+        var candidates = state.getState(voteRequest.group).candidates;
+        if (!candidateStateAnalyzer.hasUserVotedYesAtLeastOnce(candidates, voteRequest.user)) {
+            letUserVoteForNextCandidate(voteRequest);
+        }
     });
 }
 
 function handleNo(voteRequest) {
     deleteCandidate(voteRequest);
-    var candidates = state.getState(voteRequest.group).candidates;
-    if (!candidateStateAnalyzer.hasUserVotedYesAtLeastOnce(candidates, voteRequest.user)) {
-        scheduleReminderEmail(voteRequest);
-    }
+    scheduleReminderEmail(voteRequest);
+
 }
 
 function handleYesOrMaybe(voteRequest) {

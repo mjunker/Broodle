@@ -17,5 +17,5 @@ module.exports.onFindNewEvent = function (group, username) {
         state.updateVoteState(group, lookingForDayState);
         voteDayPublisher.initVote(group, username);
     });
-    return 'Event canceled';
+    return 'Vote initiated';
 }

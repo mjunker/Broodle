@@ -15,7 +15,7 @@ function detectNextUser(timeSlot, group, candidateDay) {
     var nextUser = util.findNextUserWithoutVote(timeSlot, config.get(group).members);
 
     if (_.isUndefined(nextUser)) {
-        nextUser = candidateDay.findNextUserFromTimeSlotWithMostVotes(candidateDay.timeSlots, group);
+        nextUser = candidateStateAnalyzer.findNextUserFromTimeSlotWithMostVotes(candidateDay.timeSlots, group);
     }
     return nextUser;
 }

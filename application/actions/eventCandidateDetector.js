@@ -79,9 +79,9 @@ function subtractAllOccupiedDatesFromCandidates(candidates, data) {
     });
 }
 
-function subtractRangeFromCandidate(candidate, range, item) {
+function subtractRangeFromCandidate(candidate, range, occupiedDuration) {
     candidate.ranges = _.without(candidate.ranges, range);
-    _.forEach(range.subtract(item), function (newRange) {
+    _.forEach(range.subtract(occupiedDuration), function (newRange) {
         candidate.ranges.push(newRange);
     });
 }
@@ -96,11 +96,12 @@ function extractDurations(data) {
 function initCandidates(dayRules, timeFrom, timeTo) {
 
     var candidates = [];
+    var pastDateRange = moment().range(moment().subtract(1, 'day'), moment().add(1, 'hour'));
     for (var currentDay = timeFrom; currentDay.isBefore(timeTo); currentDay.add(1, 'days')) {
         var configuredStartHour = _.find(dayRules, 'on', currentDay.format('dddd'));
         var fromTime = currentDay.clone().startOf('day').hour(configuredStartHour.from);
         var untilTime = currentDay.clone().startOf('day').hour(configuredStartHour.until);
-        var range = moment().range(fromTime, untilTime);
+        var range = moment().range(fromTime, untilTime).subtract(pastDateRange)[0];
 
         candidates.push({
             "day": util.formatAsDateString(currentDay),
